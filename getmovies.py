@@ -7,54 +7,42 @@ import time
 
 tmdbkey = ""
 
-def downPoster(id):
-  try:
+def getImage(imId, imType):
+  if imType == 'poster':
     url = 'https://image.tmdb.org/t/p/w300_and_h450_bestv2{}'
-    p_id = re.sub('\/', '', id)
+    p_id = re.sub('\/', '', imId)
     path = 'posters/'
-    fname = path + p_id
-    urllib.request.urlretrieve(url.format(id), fname)
-  except:
-    print(f'no poster for {id}')
-    pass
-
-def downBackdrop(id):
-  try:
+  elif imType == 'backdrop':
     url = 'https://image.tmdb.org/t/p/w1920_and_h800_multi_faces/{}'
-    p_id = re.sub('\/', '', id)
+    p_id = re.sub('\/', '', imId)
     path = 'backdrops/'
-    fname = path + p_id
-    urllib.request.urlretrieve(url.format(id), fname)
+  fname = path + p_id
+  try:
+    urllib.request.urlretrieve(url.format(imId), fname)
   except:
-    print(f'no backdrop for {id}')
+    print(f'no {imType} for {imId}')
     pass
 
-def resizeBackdrop(imgname):
+def resizeImg(imName, imType):
+  if imType == 'poster':
+    openpath = 'posters'
+    savepath = 'posters/xs'
+    basewidth = 150 #pixels
+  elif imType == 'backdrop':
+    openpath = 'backdrops'
+    savepath = 'backdrops/thumbnails'
+    basewidth = 500 #pixels
+  #try open image
   try:
-    # open img
-    img = Image.open('backdrops' + imgname)
-    basewidth = 500
-    # determining the height ratio
+    img = Image.open(openpath + imName)
+    # determine height ratio
     wpercent = (basewidth/float(img.size[0]))
     hsize = int((float(img.size[1])*float(wpercent)))
     # resize image and save
     img = img.resize((basewidth,hsize), Image.ANTIALIAS)
-    img.save('backdrops/thumbnails' + imgname)
+    img.save(savepath + imName)
   except:
-    pass
-
-def resizePoster(imgname):
-  try:
-    # open img
-    img = Image.open('posters' + imgname)
-    basewidth = 150
-    # determining the height ratio
-    wpercent = (basewidth/float(img.size[0]))
-    hsize = int((float(img.size[1])*float(wpercent)))
-    # resize image and save
-    img = img.resize((basewidth,hsize), Image.ANTIALIAS)
-    img.save('posters/xs' + imgname)
-  except:
+    print(f'failed to resize image {imName}')
     pass
 
 def getMovieData(id):
@@ -88,18 +76,18 @@ def getMovieData(id):
   }
   
   if movie['poster'] != '':
-    downPoster(movie['poster'])
-    resizePoster(movie['poster'])
+    getImage(movie['poster'], 'poster')
+    resizeImg(movie['poster'], 'poster')
   if movie['backdrop'] != '':
-    downBackdrop(movie['backdrop'])
-    resizeBackdrop(movie['backdrop'])
+    getImage(movie['backdrop'], 'backdrop')
+    resizeImg(movie['backdrop'], 'backdrop')
 
   time.sleep(res.elapsed.total_seconds())
 
   return movie
 
-
-with open('xdata_200607.json', 'r') as f:
+# json file with any key name and the value is the tmdb id
+with open('xdata.json', 'r') as f:
     jsondata = json.load(f)
 zz = len(jsondata)
 
@@ -112,6 +100,6 @@ for item in jsondata:
   print(f"Got movie {zz}")
   zz -= 1
 
-with open('movies_200523.json', 'w') as f:
+with open('movies_200928.json', 'w') as f:
     json.dump(movs, f, indent=2)
 
