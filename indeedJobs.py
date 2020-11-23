@@ -12,7 +12,7 @@ driver = webdriver.Chrome()
 #go to address
 driver.get("https://ie.indeed.com/")
 
-# init obj or whatever this is.. :) a slice
+# init a slice.. oh this is python not go.
 jobs = []
 
 try:
@@ -26,23 +26,22 @@ try:
     locationInput.send_keys("Cavan Town, County Cavan")
     locationInput.submit()
 
-  # suppose previous step worked and now we have a bunhc of jobs
-  # let's get the data.. I'm interested in job title, company, and link
+  # ok.. so for each job just get the job title, company and link and...
   for job in driver.find_elements_by_class_name('clickcard'):
     jobTitle = job.find_element_by_class_name('jobtitle').text
     jobLink = job.find_element_by_class_name('jobtitle').get_attribute('href')
     company = job.find_element_by_class_name('company ').text
     
-    # since I'm gonna look at this data later let's just gather it
+    # ... dump into this slice
     jobs.append({'title': jobTitle, 'company': company, 'link': jobLink})
 
 finally:
     driver.quit()
 
-# propper naming convention in my org
+# propper naming convention in my organization
 now = datetime.datetime.now()
 fname = "jobs_" + now.strftime("%Y%m%d_%H%M%S") + ".json"
 
-# asuming everything went well, I'll have some data in a json, and I'll have reading material for later :)
+# reading material for later.. 
 with open(fname, 'w') as f:
     json.dump(jobs, f, indent=2)
