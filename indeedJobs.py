@@ -12,7 +12,7 @@ driver = webdriver.Chrome()
 #go to address
 driver.get("https://ie.indeed.com/")
 
-# init obj or whatever this is.. :) a struct maybe
+# init obj or whatever this is.. :) a slice
 jobs = []
 
 try:
